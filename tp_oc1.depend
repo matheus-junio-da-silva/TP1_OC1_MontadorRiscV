@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1712158473 source:c:\users\mathe\onedrive\workspace\tp1_oc1\tp_oc1\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
