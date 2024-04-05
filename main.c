@@ -60,8 +60,15 @@ void translate_sll(char *operands, char *binary) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
+    /*if (argc != 2) {
         printf("Uso: %s arquivo_entrada.asm\n", argv[0]);
+        return 1;
+    }*/
+
+    if (argc != 2 && argc != 4) {
+        printf("Uso:\n");
+        printf("Para exibir no terminal: %s arquivo_entrada.asm\n", argv[0]);
+        printf("Para salvar em um arquivo: %s arquivo_entrada.asm -o arquivo_saida.bin\n", argv[0]);
         return 1;
     }
 
@@ -76,6 +83,20 @@ int main(int argc, char *argv[]) {
     }
 
     char linha[100]; // Tamanho arbitrário para a linha
+
+    // Se o número de argumentos for igual a 4, significa que o usuário passou um arquivo de saída
+    FILE *saida = NULL;
+    if (argc == 4) {
+        saida = fopen(argv[3], "w");
+        if (saida == NULL) {
+            printf("Erro ao abrir o arquivo de saída.\n");
+            perror("fopen");
+            printf("Valor de argv[3]: %s\n", argv[3]); // Adicionando print para verificar o valor de argv[3]
+            fclose(entrada);
+            return 1;
+        }
+    }
+
     while (fgets(linha, sizeof(linha), entrada) != NULL) {
         printf("Linha lida: %s", linha); // Print para verificar cada linha do arquivo de entrada
         
@@ -92,11 +113,11 @@ int main(int argc, char *argv[]) {
             if (opcode != NULL && operands != NULL) {
                 printf("Opcode: %s\n", opcode);
                 printf("Operandos: %s\n", operands);
-                
+                char binary[32];
                 // Adicione aqui a lógica para traduzir a instrução para código binário
                 // Traduza a instrução para código binário
                 if (strcmp(opcode, "add") == 0) {
-                    char binary[32];
+                    //char binary[32];
                     printf("Traduzindo instrução 'add'\n"); // Print para verificar que a instrução 'add' está sendo traduzida
                     
                     translate_add(operands, binary);
@@ -139,6 +160,13 @@ int main(int argc, char *argv[]) {
                     printf("%s\n", binary);
                 }
 
+                // Se o arquivo de saída estiver definido, escreva no arquivo, caso contrário, imprima no terminal
+                if (saida != NULL) {
+                    fprintf(saida, "%s\n", binary);
+                } else {
+                    printf("%s\n", binary);
+                }
+
         // Adicione outros casos para as instruções suportadas
             }
            /* 
@@ -151,5 +179,8 @@ int main(int argc, char *argv[]) {
         }
     }
     fclose(entrada);
+    if (saida != NULL) {
+        fclose(saida);
+    }
     return 0;
 }
